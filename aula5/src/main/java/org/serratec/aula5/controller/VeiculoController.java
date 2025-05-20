@@ -1,0 +1,78 @@
+package org.serratec.aula5.controller;
+import java.util.List;
+import java.util.Optional;
+
+import org.serratec.aula5.exception.CustomException;
+import org.serratec.aula5.model.Veiculo;
+import org.serratec.aula5.repository.VeiculoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/veiculos")
+public class VeiculoController {
+
+	@Autowired
+	private VeiculoRepository repository;
+
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public Veiculo inserir(@RequestBody Veiculo veiculo) {
+		return repository.save(veiculo);
+	}
+
+	@GetMapping
+	public List<Veiculo> listar() {
+		return repository.findAll();
+	}
+
+	@GetMapping("{id}")
+	public ResponseEntity<Veiculo> listarPorId(@PathVariable Long id) throws CustomException {
+	Optional<Veiculo> veiculo = repository.findById(id);
+	if (!veiculo.isPresent()) {
+		throw new CustomException(
+			"404",
+			"Veículo não encontrado",
+			java.time.LocalDateTime.now(),
+			"O veículo com o id " + id + " não existe."
+		);
+	}
+	return ResponseEntity.ok(veiculo.get());
+	}
+
+	@PostMapping("/lista")
+	@ResponseStatus(HttpStatus.CREATED)
+	public List<Veiculo> inserir(@RequestBody List<Veiculo> veiculos) {
+		return repository.saveAll(veiculos);
+
+	}
+
+	@PutMapping("{id}")
+	public ResponseEntity<Veiculo> atualizar(@PathVariable Long id, @RequestBody Veiculo veiculo) {
+		if (repository.existsById(id)) {
+			veiculo.setId(id);
+			return ResponseEntity.ok(repository.save(veiculo));
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> remover(@PathVariable Long id) {
+		if (repository.existsById(id)) {
+			repository.deleteById(id);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+}

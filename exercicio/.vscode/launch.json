@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ExercicioApplication<exercicio>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.serratec.exercicio.ExercicioApplication",
+            "projectName": "exercicio",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
